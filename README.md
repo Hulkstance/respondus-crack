@@ -14,3 +14,7 @@ This project is made only for educational purposes.
 - Respondus - a DLL responsible for all features described above. It uses MinHook.
 - Shellcode - loads `Respondus.dll` using `LdrLoadDll`. The reason behind LdrLoadDll is because we have to start the process in a suspended state, which means only `ntdll.dll` is loaded in memory at that time and we can't use for example kernel32 Win APIs. The DLL name is hard-coded, but you can easily change that.
 - MinHook - use it to compile MinHook for your own Platform Toolset and then replace `C:\Path\Respondus\Respondus\MinHook\lib\libMinHook.x86.lib` and `C:\Path\Respondus\Respondus\MinHook\lib\libMinHook.x64.lib` with the new files
+
+# Credits
+- TsudaKageyu - for MinHook
+- Ch40zz
