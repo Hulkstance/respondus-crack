@@ -19,7 +19,7 @@ ShowWindow_t OriginalShowWindow = nullptr;
 SetWindowPos_t OriginalSetWindowPos = nullptr;
 
 /*
-Enables ALT + TAB.
+Disables ALT + TAB and other combination's hooks.
 */
 HHOOK WINAPI DetourSetWindowsHookExA(
     int       idHook,
@@ -98,6 +98,15 @@ LSTATUS WINAPI DetourRegOpenKeyExA(
 
 /*
 Anti VM.
+
+SetupDiGetDeviceRegistryPropertyA(0x005a4ef8, 0x002eeeb8, SPDRP_DEVICEDESC, 0x002eee98, 0x01325e18, 1024, 0x002eeeb0)
+SetupDiGetDeviceRegistryPropertyA(0x005a4ef8, 0x002eeeb8, SPDRP_FRIENDLYNAME, 0x002eee98, 0x01325e18, 1024, 0x002eeeb0)
+SetupDiEnumDeviceInfo(0x005a4ef8, 262, 0x002eeeb8)
+SetupDiGetDeviceRegistryPropertyA(0x005a4ef8, 0x002eeeb8, SPDRP_DEVICEDESC, 0x002eee98, 0x01325e18, 1024, 0x002eeeb0)
+SetupDiGetDeviceRegistryPropertyA 0x005a4ef8, 0x002eeeb8, SPDRP_FRIENDLYNAME, 0x002eee98, 0x01325e18, 1024, 0x002eeeb0)
+SetupDiEnumDeviceInfo(0x005a4ef8, 263, 0x002eeeb8)
+...
+
 */
 HDEVINFO WINAPI DetourSetupDiGetClassDevsW(
     const GUID* ClassGuid,
