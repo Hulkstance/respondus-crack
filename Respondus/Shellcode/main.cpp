@@ -4,14 +4,10 @@
 
 int main()
 {
-    //wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
-    //volatile char EnterCriticalSection[] = { 'E', 'n', 't', 'e', 'r', 'C', 'r', 'i', 't', 'i', 'c', 'a', 'l', 'S', 'e', 'c', 't', 'i', 'o', 'n', 0 };
-    //void* test = get_proc_address(get_module_handle(kernel32), (char*)EnterCriticalSection);
-
     // Path
     wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
     volatile char GetCurrentDirectoryW[] = { 'G', 'e', 't', 'C', 'u', 'r', 'r', 'e', 'n', 't', 'D', 'i', 'r', 'e', 'c', 't', 'o', 'r', 'y', 'W', 0 };
-    GetCurrentDirectoryW_t GetCurrentDirectoryAddress = (GetCurrentDirectoryW_t)get_proc_address(get_module_handle(kernel32), (char*)GetCurrentDirectoryW);
+    GetCurrentDirectoryW_t GetCurrentDirectoryAddress = (GetCurrentDirectoryW_t)get_proc_address(get_module_handle(kernel32), const_cast<char*>(GetCurrentDirectoryW));
 
     wchar_t path[MAX_PATH];
     GetCurrentDirectoryAddress(MAX_PATH, path);

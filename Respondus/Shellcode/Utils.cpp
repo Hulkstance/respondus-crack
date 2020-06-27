@@ -5,7 +5,7 @@ void* __malloc(size_t size)
 {
     wchar_t ntdll[] = { 'n', 't', 'd', 'l', 'l', '.', 'd', 'l', 'l', 0 };
     volatile char _RtlAllocateHeap[] = { 'R', 't', 'l', 'A', 'l', 'l', 'o', 'c', 'a', 't', 'e', 'H', 'e', 'a', 'p', 0 };
-    RtlAllocateHeap_t RtlAllocateHeap = (RtlAllocateHeap_t)get_proc_address(get_module_handle(ntdll), (char*)_RtlAllocateHeap);
+    RtlAllocateHeap_t RtlAllocateHeap = (RtlAllocateHeap_t)get_proc_address(get_module_handle(ntdll), const_cast<char*>(_RtlAllocateHeap));
 
     wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
     char _GetProcessHeap[] = { 'G', 'e', 't', 'P', 'r', 'o', 'c', 'e', 's', 's', 'H', 'e', 'a', 'p', 0 };
@@ -80,7 +80,7 @@ char* __strchr(const char* p, int32_t ch)
     for (;; ++p)
     {
         if (*p == c)
-            return (char*)p;
+            return const_cast<char*>(p);
         if (!*p)
             return nullptr;
     }
