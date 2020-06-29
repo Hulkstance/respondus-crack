@@ -212,6 +212,8 @@ void* get_proc_address(void* module, const char* functionName)
                 if (!pModule)
                     return nullptr;
 
+                __free(allocatedMemory);
+
                 return get_proc_address(pModule, forwardName);
             }
 
