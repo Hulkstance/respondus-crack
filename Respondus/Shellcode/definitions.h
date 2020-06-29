@@ -1,14 +1,15 @@
 #pragma once
 
-typedef PVOID(NTAPI* RtlAllocateHeap_t)(
-    IN PVOID  HeapHandle,
-    IN ULONG  Flags,
-    IN SIZE_T Size);
+typedef LPVOID(WINAPI* VirtualAlloc_t)(
+    _In_opt_ LPVOID lpAddress,
+    _In_     SIZE_T dwSize,
+    _In_     DWORD flAllocationType,
+    _In_     DWORD flProtect);
 
-typedef BOOLEAN(NTAPI* RtlFreeHeap_t)(
-    IN PVOID HeapHandle,
-    IN ULONG Flags OPTIONAL,
-    IN PVOID MemoryPointer);
+typedef BOOL(WINAPI* VirtualFree_t)(
+    _Pre_notnull_ _When_(dwFreeType == MEM_DECOMMIT, _Post_invalid_) _When_(dwFreeType == MEM_RELEASE, _Post_ptr_invalid_) LPVOID lpAddress,
+    _In_ SIZE_T dwSize,
+    _In_ DWORD dwFreeType);
 
 typedef NTSTATUS(NTAPI* LdrLoadDll_t)(
     IN PWCHAR               PathToFile OPTIONAL,

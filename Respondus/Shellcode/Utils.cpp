@@ -3,41 +3,53 @@
 
 void* __malloc(size_t size)
 {
-    wchar_t ntdll[] = { 'n', 't', 'd', 'l', 'l', '.', 'd', 'l', 'l', 0 };
-    volatile char _RtlAllocateHeap[] = { 'R', 't', 'l', 'A', 'l', 'l', 'o', 'c', 'a', 't', 'e', 'H', 'e', 'a', 'p', 0 };
-    RtlAllocateHeap_t RtlAllocateHeap = (RtlAllocateHeap_t)get_proc_address(get_module_handle(ntdll), const_cast<char*>(_RtlAllocateHeap));
-
     wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
-    char _GetProcessHeap[] = { 'G', 'e', 't', 'P', 'r', 'o', 'c', 'e', 's', 's', 'H', 'e', 'a', 'p', 0 };
-    GetProcessHeap_t GetProcessHeap = (GetProcessHeap_t)get_proc_address(get_module_handle(kernel32), _GetProcessHeap);
+    char _VirtualAlloc[] = { 'V', 'i', 'r', 't', 'u', 'a', 'l', 'A', 'l', 'l', 'o', 'c', 0 };
+    VirtualAlloc_t VirtualAlloc = reinterpret_cast<VirtualAlloc_t>(get_proc_address(get_module_handle(kernel32), _VirtualAlloc));
 
-    return RtlAllocateHeap(GetProcessHeap(), 0, size);
+    if (!VirtualAlloc)
+        return nullptr;
+
+    return VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 }
 
-void __free(void* p)
+BOOL __free(void* block)
 {
-    wchar_t ntdll[] = { 'n', 't', 'd', 'l', 'l', '.', 'd', 'l', 'l', 0 };
-    char _RtlFreeHeap[] = { 'R', 't', 'l', 'F', 'r', 'e', 'e', 'H', 'e', 'a', 'p', 0 };
-    RtlFreeHeap_t RtlFreeHeap = (RtlFreeHeap_t)get_proc_address(get_module_handle(ntdll), _RtlFreeHeap);
-
     wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
-    char _GetProcessHeap[] = { 'G', 'e', 't', 'P', 'r', 'o', 'c', 'e', 's', 's', 'H', 'e', 'a', 'p', 0 };
-    GetProcessHeap_t GetProcessHeap = (GetProcessHeap_t)get_proc_address(get_module_handle(kernel32), _GetProcessHeap);
+    char _VirtualFree[] = { 'V', 'i', 'r', 't', 'u', 'a', 'l', 'F', 'r', 'e', 'e', 0 };
+    VirtualFree_t VirtualFree = reinterpret_cast<VirtualFree_t>(get_proc_address(get_module_handle(kernel32), _VirtualFree));
 
-    if (p)
-        RtlFreeHeap(GetProcessHeap(), 0, p);
+    if (!VirtualFree)
+        return FALSE;
+
+    return VirtualFree(block, 0, MEM_RELEASE);
 }
 
-void* __memcpy(void* to, const void* from, size_t count)
+void* __memcpy(void* dst, void* src, size_t size)
 {
-    char* f = (char*)from;
-    char* t = (char*)to;
-    size_t i = count;
+    char* source = reinterpret_cast<char*>(src);
+    char* destination = reinterpret_cast<char*>(dst);
+
+    size_t i = size;
 
     while (i-- > 0)
-        *t++ = *f++;
+        *destination++ = *source++;
 
-    return to;
+    return dst;
+}
+
+void* __memset(void* src, int val, size_t size)
+{
+    char* source = reinterpret_cast<char*>(src);
+
+    while (size > 0)
+    {
+        *source = val;
+        source++;
+        size--;
+    }
+
+    return src;
 }
 
 size_t __strlen(const char* str)
@@ -68,7 +80,7 @@ char* __strdup(const char* s)
     if (!copy)
         return nullptr;
 
-    __memcpy(copy, s, len);
+    __memcpy(copy, const_cast<char*>(s), len);
 
     return copy;
 }
@@ -121,26 +133,12 @@ wchar_t* __wcscat(wchar_t* s1, const wchar_t* s2)
     return s1;
 }
 
-void* __memset(void* src, int val, size_t count)
+wchar_t* ascii_to_unicode(char* ascii, wchar_t* memory, size_t memory_size)
 {
-    char* char_src = (char*)src;
+    wchar_t* unicode = memory;
 
-    while (count > 0) 
-    {
-        *char_src = val;
-        char_src++;
-        count--;
-    }
-
-    return src;
-}
-
-wchar_t* ascii_to_unicode(char* ascii, wchar_t* allocMem, size_t allocMemSize)
-{
-    wchar_t* unicode = allocMem;
-
-    while (*allocMem++ = *ascii++)
-        allocMemSize--;
+    while (*memory++ = *ascii++)
+        memory_size--;
 
     return unicode;
 }
@@ -202,8 +200,8 @@ void* get_proc_address(void* module, const char* functionName)
                 char* forwardName = __strchr(forwardLib, '.');
                 *forwardName++ = 0;
 
-                size_t size = sizeof(forwardLib) + sizeof(wchar_t);
-                wchar_t* allocatedMemory = (wchar_t*)__malloc(size);
+                size_t size = __strlen(forwardLib) * sizeof(wchar_t);
+                wchar_t* allocatedMemory = reinterpret_cast<wchar_t*>(__malloc(size));
                 wchar_t* unicode = ascii_to_unicode(forwardLib, allocatedMemory, size);
                 wchar_t dll[] = { '.', 'd', 'l', 'l', 0 };
                 __wcscat(unicode, dll);
