@@ -198,7 +198,7 @@ void* get_proc_address(void* module, const char* functionName)
                 char* forwardName = __strchr(forwardLib, '.');
                 *forwardName++ = 0;
 
-                size_t size = __strlen(forwardLib) * sizeof(wchar_t);
+                size_t size = __strlen(forwardLib);
                 wchar_t* allocatedMemory = reinterpret_cast<wchar_t*>(__malloc(size));
                 wchar_t* unicode = ascii_to_unicode(forwardLib, allocatedMemory, size);
                 wchar_t dll[] = { '.', 'd', 'l', 'l', 0 };
