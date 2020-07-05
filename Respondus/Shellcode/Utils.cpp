@@ -3,8 +3,8 @@
 
 void* __malloc(size_t size)
 {
-    wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
-    char _VirtualAlloc[] = { 'V', 'i', 'r', 't', 'u', 'a', 'l', 'A', 'l', 'l', 'o', 'c', 0 };
+    const wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
+    const char _VirtualAlloc[] = { 'V', 'i', 'r', 't', 'u', 'a', 'l', 'A', 'l', 'l', 'o', 'c', 0 };
     VirtualAlloc_t VirtualAlloc = reinterpret_cast<VirtualAlloc_t>(get_proc_address(get_module_handle(kernel32), _VirtualAlloc));
     if (!VirtualAlloc)
         return nullptr;
@@ -14,8 +14,8 @@ void* __malloc(size_t size)
 
 BOOL __free(void* block)
 {
-    wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
-    char _VirtualFree[] = { 'V', 'i', 'r', 't', 'u', 'a', 'l', 'F', 'r', 'e', 'e', 0 };
+    const wchar_t kernel32[] = { 'k', 'e', 'r', 'n', 'e', 'l', '3', '2', '.', 'd', 'l', 'l', 0 };
+    const char _VirtualFree[] = { 'V', 'i', 'r', 't', 'u', 'a', 'l', 'F', 'r', 'e', 'e', 0 };
     VirtualFree_t VirtualFree = reinterpret_cast<VirtualFree_t>(get_proc_address(get_module_handle(kernel32), _VirtualFree));
     if (!VirtualFree)
         return FALSE;
