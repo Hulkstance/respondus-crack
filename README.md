@@ -1,6 +1,6 @@
 # Respondus Bypass
 
-This project is made only for educational purposes.
+This project is made only for educational purposes. It bypasses LockDown Browser, made by Respondus.
 
 # Features
 - Removes hooks from key combinations like `ALT + TAB`
